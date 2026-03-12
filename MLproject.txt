@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Water Footprint Predictor</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Roboto', sans-serif;
+      padding: 20px;
+      margin: 0;
+      background: linear-gradient(to right, #e0f7fa, #ffffff);
+    }
+
+    .container {
+      max-width: 900px;
+      margin: auto;
+      background: #ffffff;
+      padding: 40px;
+      border-radius: 12px;
+      box-shadow: 0 0 15px rgba(0,0,0,0.1);
+    }
+
+    header, footer {
+      text-align: center;
+      margin-bottom: 25px;
+    }
+
+    header h1 {
+      font-size: 32px;
+      color: #00796b;
+    }
+
+    header p {
+      font-size: 18px;
+      color: #555;
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    label {
+      display: block;
+      font-weight: bold;
+      margin-bottom: 6px;
+      font-size: 16px;
+    }
+
+    input, select {
+      width: 100%;
+      padding: 12px;
+      font-size: 16px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      transition: border-color 0.3s;
+    }
+
+    input:focus, select:focus {
+      border-color: #00796b;
+      outline: none;
+    }
+
+    .predict-button {
+      background-color: #00796b;
+      color: white;
+      padding: 15px 30px;
+      font-size: 18px;
+      border: none;
+      cursor: pointer;
+      border-radius: 8px;
+      transition: all 0.3s ease;
+    }
+
+    .predict-button:hover {
+      background-color: #004d40;
+      transform: scale(1.05);
+      box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+    }
+
+    .results-container {
+      display: none;
+      margin-top: 30px;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+
+    .results-container.visible {
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .result-card {
+      flex: 1 1 30%;
+      padding: 25px;
+      border-radius: 10px;
+      text-align: center;
+      color: #333;
+      transition: transform 0.3s ease;
+    }
+
+    .result-card:hover {
+      transform: translateY(-5px);
+    }
+
+    .result-card.green {
+      background-color: #d0f0c0;
+    }
+
+    .result-card.blue {
+      background-color: #b3e5fc;
+    }
+
+    .result-card.grey {
+      background-color: #eeeeee;
+    }
+
+    .value {
+      font-size: 28px;
+      font-weight: bold;
+      color: #00796b;
+    }
+
+    .unit {
+      font-size: 14px;
+      color: #666;
+    }
+
+    footer p {
+      font-size: 14px;
+      color: #777;
+      margin-top: 40px;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <header>
+      <h1>Water Footprint Predictor</h1>
+      <p>Predict the water footprint of products based on their characteristics</p>
+    </header>
+
+    <main>
+      <form id="predictionForm">
+        <div class="form-group">
+          <label for="productType">Product Type</label>
+          <select id="productType" required>
+            <option value="">Select Product Type</option>
+            <option value="Food">Food</option>
+            <option value="Clothing">Clothing</option>
+            <option value="Cosmetic">Cosmetic</option>
+            <option value="Electronics">Electronics</option>
+            <option value="Other">Other</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="material">Material Composition</label>
+          <input type="text" id="material" required placeholder="e.g., Cotton, Wheat, Metal"/>
+        </div>
+
+        <div class="form-group">
+          <label for="region">Region</label>
+          <select id="region" required>
+            <option value="">Select Region</option>
+            <option value="Europe">Europe</option>
+            <option value="Asia">Asia</option>
+            <option value="America">America</option>
+            <option value="Africa">Africa</option>
+            <option value="Oceania">Oceania</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="productionMethod">Production Method</label>
+          <select id="productionMethod" required>
+            <option value="">Select Production Method</option>
+            <option value="Industrial">Industrial</option>
+            <option value="Organic">Organic</option>
+            <option value="Traditional">Traditional</option>
+            <option value="Sustainable">Sustainable</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="weight">Weight/Volume (kg or L)</label>
+          <input type="number" id="weight" required min="0" step="0.1" placeholder="e.g., 1.0"/>
+        </div>
+
+        <div class="form-group">
+          <label for="energy">Energy Input (kWh)</label>
+          <input type="number" id="energy" required min="0" placeholder="e.g., 100"/>
+        </div>
+
+        <div class="form-group">
+          <label for="fertilizer">Fertilizer Use (kg)</label>
+          <input type="number" id="fertilizer" required min="0" placeholder="e.g., 20"/>
+        </div>
+
+        <div class="form-group">
+          <label for="co2">CO2 Emission (kg)</label>
+          <input type="number" id="co2" required min="0" placeholder="e.g., 50"/>
+        </div>
+
+        <div style="text-align: center;">
+          <button type="submit" class="predict-button">Predict Water Footprint</button>
+        </div>
+      </form>
+
+      <div id="results" class="results-container">
+        <div class="result-card green">
+          <h3>Green Water Footprint</h3>
+          <p class="value" id="greenResult">-</p>
+          <p class="unit">liters</p>
+        </div>
+        <div class="result-card blue">
+          <h3>Blue Water Footprint</h3>
+          <p class="value" id="blueResult">-</p>
+          <p class="unit">liters</p>
+        </div>
+        <div class="result-card grey">
+          <h3>Grey Water Footprint</h3>
+          <p class="value" id="greyResult">-</p>
+          <p class="unit">liters</p>
+        </div>
+      </div>
+    </main>
+
+    <footer>
+      <p>Water Footprint Prediction Model | © 2024</p>
+    </footer>
+  </div>
+
+  <script>
+    document.getElementById("predictionForm").addEventListener("submit", function (e) {
+      e.preventDefault();
+
+      const weight = parseFloat(document.getElementById("weight").value);
+      const energy = parseFloat(document.getElementById("energy").value);
+      const fertilizer = parseFloat(document.getElementById("fertilizer").value);
+      const co2 = parseFloat(document.getElementById("co2").value);
+
+      // Simple placeholder calculation
+      const green = (weight * 80 + energy * 0.4).toFixed(2);
+      const blue = (fertilizer * 3 + co2 * 0.3).toFixed(2);
+      const grey = (weight + energy + fertilizer + co2).toFixed(2);
+
+      document.getElementById("greenResult").textContent = green;
+      document.getElementById("blueResult").textContent = blue;
+      document.getElementById("greyResult").textContent = grey;
+
+      const results = document.getElementById("results");
+      results.classList.add("visible");
+
+      results.scrollIntoView({ behavior: "smooth" });
+    });
+  </script>
+</body>
+</html>
